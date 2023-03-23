@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:15.2-alpine
+    container_name: tm_postgres
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+
+
+  api:
+    build: .
+    container_name: tm_app
+    volumes:
+      - .:/app:cached
+      - ~/.ssh:/root/.ssh
+      - ~/.bash_history:/root/.bash_history
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment: &api-environment
+      DJANGO_ENV: dev
+      DJANGO_SECRET_KEY: secret_key
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8000
+
+
+
